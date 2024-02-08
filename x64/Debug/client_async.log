@@ -1,0 +1,4 @@
+﻿  client_async.c
+D:\repos\client_async\client_async.c(17,8): warning C4101: 'cbRead': unreferenced local variable
+D:\repos\client_async\client_async.c(17,16): warning C4101: 'cbWritten': unreferenced local variable
+  client_async.vcxproj -> D:\repos\client_async\x64\Debug\client_async.exe
