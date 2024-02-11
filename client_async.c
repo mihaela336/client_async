@@ -179,8 +179,8 @@ int main(int argc, TCHAR* argv[])
     int n;
     scanf("%d", &n);
 
-    TCHAR lpvMessage[32]; // Assuming a maximum of 32 characters for the number
-    sprintf(lpvMessage, "%d", n);
+    //TCHAR lpvMessage[32]; // Assuming a maximum of 32 characters for the number
+    //sprintf(lpvMessage, "%d", n);
 
     while (1)
     {
@@ -228,42 +228,61 @@ int main(int argc, TCHAR* argv[])
     }
 
     // Send message asynchronously
-    fSuccess = WriteFile(
-        hPipe,
-        lpvMessage,
-        (lstrlen(lpvMessage) + 1) * sizeof(TCHAR),
-        &cbWritten,
-        &ovWrite);
-
-    if (!fSuccess)
+    //Trimite numere catre server
+    for (int i = 0; i <= n; i++)
     {
-        printf("Error sending message: %d\n", GetLastError());
-        CloseHandle(ovWrite.hEvent); // Cleanup
-        CloseHandle(ovRead.hEvent);  // Cleanup
-        return 0;
+        if (i < n)
+        {
+            TCHAR lpvMessage[32]; // Assuming a maximum of 32 characters for the number
+            sprintf(lpvMessage, "%d", i);
+            fSuccess = WriteFile(
+                hPipe,
+                lpvMessage,
+                (lstrlen(lpvMessage) + 1) * sizeof(TCHAR),
+                &cbWritten,
+                &ovWrite);
+
+
+
+            if (!fSuccess)
+            {
+                printf("Error sending message: %d\n", GetLastError());
+                CloseHandle(ovWrite.hEvent); // Cleanup
+                CloseHandle(ovRead.hEvent);  // Cleanup
+                return 0;
+            }
+            else
+            {
+                printf(TEXT("Am trimis catre server : %s\n"), lpvMessage);
+            }
+        }
+
+        // Read message asynchronously
+        fSuccess = ReadFile(
+            hPipe,
+            chBuf,
+            BUFSIZE * sizeof(TCHAR),
+            &cbRead,
+            &ovRead);
+
+        //if (i < n) {
+            printf(TEXT("Am primit de la server raspunsul : %s\n"), chBuf);
+      //  }
+
+        if (!fSuccess && GetLastError() != ERROR_IO_PENDING)
+        {
+            printf("Error receiving message: %d\n", GetLastError());
+            CloseHandle(ovWrite.hEvent); // Cleanup
+            CloseHandle(ovRead.hEvent);  // Cleanup
+            return 0;
+        }
+
+
+
+        // Wait for the read completion event
+        WaitForSingleObject(ovRead.hEvent, INFINITE);
+
     }
-
-    // Read message asynchronously
-    fSuccess = ReadFile(
-        hPipe,
-        chBuf,
-        BUFSIZE * sizeof(TCHAR),
-        &cbRead,
-        &ovRead);
-
-    printf(TEXT("Am primit de la server raspunsul : %s\n"), chBuf);
-
-    if (!fSuccess && GetLastError() != ERROR_IO_PENDING)
-    {
-        printf("Error receiving message: %d\n", GetLastError());
-        CloseHandle(ovWrite.hEvent); // Cleanup
-        CloseHandle(ovRead.hEvent);  // Cleanup
-        return 0;
-    }
-
-
-    // Wait for the read completion event
-    WaitForSingleObject(ovRead.hEvent, INFINITE);
 
     // Cleanup
     CloseHandle(hPipe);
