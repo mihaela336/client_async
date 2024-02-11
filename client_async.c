@@ -179,8 +179,6 @@ int main(int argc, TCHAR* argv[])
     int n;
     scanf("%d", &n);
 
-    //TCHAR lpvMessage[32]; // Assuming a maximum of 32 characters for the number
-    //sprintf(lpvMessage, "%d", n);
 
     while (1)
     {
@@ -227,7 +225,7 @@ int main(int argc, TCHAR* argv[])
         return 0;
     }
 
-    // Send message asynchronously
+ 
     //Trimite numere catre server
     for (int i = 0; i <= n; i++)
     {
@@ -257,7 +255,7 @@ int main(int argc, TCHAR* argv[])
             }
         }
 
-        // Read message asynchronously
+        // Citire mesaj
         fSuccess = ReadFile(
             hPipe,
             chBuf,
@@ -265,9 +263,9 @@ int main(int argc, TCHAR* argv[])
             &cbRead,
             &ovRead);
 
-        //if (i < n) {
+
             printf(TEXT("Am primit de la server raspunsul : %s\n"), chBuf);
-      //  }
+
 
         if (!fSuccess && GetLastError() != ERROR_IO_PENDING)
         {
